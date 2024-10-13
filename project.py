@@ -1,23 +1,34 @@
 import pygame as pg
 import time
+from random import randint
 
-def main():
+pg.init()
+pg.event.clear()
+width, height = 1000, 600
+background_color = (0, 0, 255)
+text_color = (0,0,0)
+correct_color = (0,255,0)
+incorrect_color = (255,0,0)
+screen = pg.display.set_mode((width, height))
+pg.display.set_caption("The project")
 
-    pg.init()
-    pg.event.clear()
-    width, height = 1000, 600
-    background_color = (0, 0, 255)
-    text_color = (0,0,0)
-    correct_color = (0,255,0)
-    incorrect_color = (255,0,0)
-    screen = pg.display.set_mode((width, height))
-    pg.display.set_caption("The project")
+
+def setTarget(filename):
+    lines = open(filename, "r")
+    for s in lines:
+        r = randint(0, 1)
+        if r == 1:
+            return s[:-1]
+    return lines.readline()[:-1]
+
+
+def main(screen):
 
     running = True
     started = False
     ended = False
 
-    target = "The quick brown fox jumps over the lazy dog"
+    target = setTarget("targets.txt")
     n = len(target)
 
     target_l = [char for char in target]
@@ -37,6 +48,8 @@ def main():
             event = pg.event.wait()
             if event.type == pg.QUIT:
                 running = False
+            elif event.type == pg.KEYDOWN and event.key == pg.K_TAB:
+                main(screen)
             else:
                 if event.type == pg.KEYDOWN:
 
@@ -87,6 +100,9 @@ def main():
             if event.type == pg.QUIT:
                 pg.quit()
                 break
+            else:
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    main(screen)
 
 if __name__ == "__main__":
-    main()
+    main(screen)
