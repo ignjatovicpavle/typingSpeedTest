@@ -12,6 +12,7 @@ incorrect_color = (255,0,0)
 screen = pg.display.set_mode((width, height))
 pg.display.set_caption("The project")
 
+special_characters = {'.', ',', ';', ':', '$', '#', '%', '&', '!', '@', '^', '*', '(', ')' }
 
 def setTarget(filename):
     lines = open(filename, "r")
@@ -48,20 +49,26 @@ def main(screen):
             event = pg.event.wait()
             if event.type == pg.QUIT:
                 running = False
-            elif event.type == pg.KEYDOWN and event.key == pg.K_TAB:
-                main(screen)
-            else:
-                if event.type == pg.KEYDOWN:
-
+            elif event.type == pg.KEYDOWN: 
+                if event.key == pg.K_TAB:
+                    main(screen)
+                else:
                     if not started:
                         started = True
                         t0 = time.time()
 
-                    if event.key != pg.K_BACKSPACE:
-                        userText.append(event.unicode)
-                    else:
+                    if event.key == pg.K_BACKSPACE:
                         if len(userText) > 0:
                             userText = userText[:-1]
+                    elif (
+                    event.unicode.isalpha() 
+                    or event.unicode.isdigit() 
+                    or event.key == pg.K_LSHIFT 
+                    or event.key == pg.K_RSHIFT 
+                    or event.key == pg.K_SPACE
+                    or event.unicode in special_characters
+                    ):
+                        userText.append(event.unicode)
 
             font = pg.font.Font(None, 32)
             w = 0
