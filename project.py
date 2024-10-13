@@ -4,7 +4,7 @@ from random import randint
 
 pg.init()
 pg.event.clear()
-width, height = 1000, 600
+width, height = 1300, 600
 text_x, text_y = 20, 250
 background_color = (250, 242, 220)
 text_color = (138, 130, 109)
@@ -14,16 +14,13 @@ screen = pg.display.set_mode((width, height))
 pg.display.set_caption("The project")
 font = pg.font.Font(None, 32)
 
-special_characters = {'.', ',', ';', ':', '$', '#', '%', '&', '!', '@', '^', '*', '(', ')' }
+special_characters = {'.', ',', ';', ':', '$', '#', '%', '&', '!', '@', '^', '*', '(', ')', '?', '=', '"'}
 
 def setTarget(filename):
     with open(filename, "r") as file:
         lines = file.readlines()
-        for s in lines:
-            r = randint(0, 1)
-            if r == 1:
-                return s.strip()
-        return lines[0].strip()
+        r = randint(0, len(lines)) 
+        return lines[r].strip()
 
 
 def main(screen):
@@ -46,8 +43,6 @@ def main(screen):
     outputText = ""
 
     while running:
-        if len(userText) >= n:
-            ended = True
 
         if not ended:
 
@@ -71,8 +66,6 @@ def main(screen):
                     elif (
                     event.unicode.isalpha() 
                     or event.unicode.isdigit() 
-                    or event.key == pg.K_LSHIFT 
-                    or event.key == pg.K_RSHIFT 
                     or event.key == pg.K_SPACE
                     or event.unicode in special_characters
                     ):
@@ -83,8 +76,11 @@ def main(screen):
 
             for i in range (len(userText)):
                 char = userText[i]
-                if char == target[i]:
-                    color = correct_color
+                if i < n:
+                    if char == target[i]:
+                        color = correct_color
+                    else:
+                        color = incorrect_color
                 else:
                     color = incorrect_color
 
@@ -93,10 +89,12 @@ def main(screen):
                 w+=t.get_rect().width
 
             userText_str = ''.join(userText)
-            text2 = font.render(target[len(userText_str):], True, text_color)
-            
-            
-            screen.blit(text2, (w, text_y))
+            if len(userText) >= n:
+                if userText_str == target:
+                    ended = True
+            else:
+                text2 = font.render(target[len(userText_str):], True, text_color)
+                screen.blit(text2, (w, text_y))
 
         else:
             t1 = time.time()
@@ -105,6 +103,7 @@ def main(screen):
             print(f"Ended. {wpm} WPM")
             text = font.render(f"Test ended. Result: {wpm} WPM", True, text_color)
             screen.blit(text, (text_x, text_y + 50))
+            screen.blit(font.render(f"Press SPACE to play again...", True, text_color), (text_x, text_y + 80))
             running = False
 
         pg.display.flip()
